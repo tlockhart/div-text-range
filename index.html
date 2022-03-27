@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="style.css" />
+    <script type="text/javascript">
+      function FindNext() {
+        // color
+        var css = "element::selection { color: red; }";
+        let head = document.head || document.getElementsByTagName("head")[0];
+        let style = document.createElement("style");
+        style.appendChild(document.createTextNode(css));
+        head.appendChild(style);
+
+        var search_str = document.getElementById("findField").value;
+        console.log("SRT:", search_str);
+        if (search_str == "") {
+          alert("Please enter some text to search!");
+          return;
+        }
+
+        var supported = false;
+        var found = false;
+
+        supported = window.find(search_str);
+        console.log("Supported:", supported);
+        if (supported) {
+          // var el = document.getElementById("collection-content");
+          let text = document.getElementById("text");
+          // text = str.innerHTML;
+          console.log("text:", text.innerHTML);
+          const regex = new RegExp(search_str, "gi");
+          // document.execCommand("hiliteColor", true, "red");
+          let marked = text.innerHTML.replace(
+            regex,
+            "<mark>" + search_str + " </mark>"
+          );
+          console.log("Marked:", marked);
+          text.innerHTML = marked;
+
+          found = true;
+        } else {
+          if (document.selection && document.selection.createRange) {
+            // Internet Explorer, Opera before version 10.5
+            var textRange = document.selection.createRange();
+            if (textRange.findText) {
+              // Internet Explorer
+              supported = true;
+              // if some content is selected, the start position of the search
+              // will be the position after the start position of the selection
+              if (textRange.text.length > 0) {
+                textRange.collapse(true);
+                textRange.move("character", 1);
+              }
+
+              found = textRange.findText(search_str);
+              if (found) {
+                textRange.select();
+              }
+            }
+          }
+        }
+
+        if (supported) {
+          if (!found) {
+            alert("The following text was not found:\n" + search_str);
+          }
+        } else {
+          alert("Your browser does not support this example!");
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="text">
+      LaLa, Lala, laLa , lala, lalala, tralala, some other text. Lala.
+    </div>
+    <br />
+    <input type="text" id="findField" value="lala" size="20" />
+    <button onclick="FindNext ();">Find!</button>
+  </body>
+</html>
